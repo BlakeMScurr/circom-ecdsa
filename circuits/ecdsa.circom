@@ -225,6 +225,15 @@ template ECDSAVerifyNoPubkeyCheck(n, k) {
     result <== res_comp.out;
 }
 
+template CheckPubkey(n, k) {
+    signal input pubkey[2][k];
+
+    var order_minus_one[100] = get_secp256k1_order(n, k);
+    order_minus_one[0]--;
+    
+    
+}
+
 // TODO: implement ECDSA extended verify
 // r, s, and msghash have coordinates
 // encoded with k registers of n bits each
