@@ -226,12 +226,27 @@ template ECDSAVerifyNoPubkeyCheck(n, k) {
 }
 
 template CheckPubkey(n, k) {
+    assert(n == 64 && k == 4);
+
     signal input pubkey[2][k];
 
-    var order_minus_one[100] = get_secp256k1_order(n, k);
+    var order_minus_one[100] = get_secp256k1_order(n, k); // Note, why does this have 100 entries? Just copied from verification template.
     order_minus_one[0]--;
     
-    
+    component point_on_curve = Secp256k1PointOnCurve(n, k);
+    for (var i = 0; i < 4; i++) {
+        point_on_curve.x <== pubkey[0][i];
+        point_on_curve.y <== pubkey[1][i];
+    }
+
+    component lhs = Secp256k1ScalarMult(n, k);
+    for (var i = 0; i < k; i++) {
+        lhs.scalar[i] <== order_minus_one[i];
+    }
+    for (var i = 0; i < 4; i++) {
+        lhs.point[0] <== pubkey[0][i];
+        lhs.point[1] <== pubkey[1][i];
+    }
 }
 
 // TODO: implement ECDSA extended verify
