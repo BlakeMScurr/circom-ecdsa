@@ -239,9 +239,10 @@ template ECDSACheckPubKey(n, k) {
     }
 
     // We don't represent 0 as an actual point so we can't directly check that nQ = 0
-    // Instead we check that (n - 1) * Q = -Q
+    // Instead we check that (n - 2)Q = 2(-Q)
+    // Note that we can't use (n - 1)Q = -Q since the double and add circuit implicitly tries to calculate nQ and errors
     var order_minus_one[100] = get_secp256k1_order(n, k);
-    order_minus_one[0]--;
+    order_minus_one[0] -= 2;
     
     component lhs = Secp256k1ScalarMult(n, k);
     for (var i = 0; i < k; i++) {
@@ -255,9 +256,6 @@ template ECDSACheckPubKey(n, k) {
     // Check each coordinate of our equality independently.
     // Note: Q = (x, y) => -Q = (x, -y)
     // So we can check the x coordinate with [(n-1)*Q].x = Q.x,
-    for (var i = 0; i < k; i++) {
-        lhs.out[0][i] === pubkey[0][i];
-    }
 
     // Because -y === p - y mod p,
     //  we can check the y coordinate with [(n-1)*Q].y = p - Q.y
@@ -269,8 +267,15 @@ template ECDSACheckPubKey(n, k) {
     }
     negative_y.underflow === 0;
 
+    component two_times_negative_q = Secp256k1Double(n, k);
     for (var i = 0; i < k; i++) {
-        lhs.out[1][i] === negative_y.out[i];
+        two_times_negative_q.in[0][i] <== pubkey[0][i];
+        two_times_negative_q.in[1][i] <== negative_y.out[i];
+    }
+
+    for (var i = 0; i < k; i++) {
+        lhs.out[0][i] === two_times_negative_q.out[0][i];
+        lhs.out[1][i] === two_times_negative_q.out[1][i];
     }
 }
 

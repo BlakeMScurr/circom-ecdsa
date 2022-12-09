@@ -216,11 +216,13 @@ describe("ECDSACheckPubKey", function () {
     this.timeout(1000 * 1000);
 
     var test_cases: Array<[bigint, bigint]> = [];
-    var privkeys: Array<bigint> = [88549154299169935420064281163296845505587953610183896504176354567359434168161n,
-                                //    37706893564732085918706190942542566344879680306879183356840008504374628845468n,
-                                //    90388020393783788847120091912026443124559466591761394939671630294477859800601n,
-                                //    110977009687373213104962226057480551605828725303063265716157300460694423838923n
-                                ];
+    var privkeys: Array<bigint> = [
+        88549154299169935420064281163296845505587953610183896504176354567359434168161n,
+        37706893564732085918706190942542566344879680306879183356840008504374628845468n,
+        90388020393783788847120091912026443124559466591761394939671630294477859800601n,
+        110977009687373213104962226057480551605828725303063265716157300460694423838923n
+    ];
+
     for (var idx = 0; idx < privkeys.length; idx++) {
         var pubkey: Point = Point.fromPrivateKey(privkeys[idx]);
         test_cases.push([pubkey.x, pubkey.y]);
@@ -229,7 +231,6 @@ describe("ECDSACheckPubKey", function () {
     let circuit: any;
     before(async function () {
         circuit = await wasm_tester(path.join(__dirname, "circuits", "test_ecdsa_check_pub_key.circom"));
-        console.log("Compilation finished");
     });
 
     var test_ecdsa_verify = function (test_case: [bigint, bigint]) {
