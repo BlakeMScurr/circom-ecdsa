@@ -244,12 +244,6 @@ describe("ECDSACheckPubKey", function () {
             let witness = await circuit.calculateWitness({"pubkey": [pub0_array, pub1_array]});
             await circuit.checkConstraints(witness);
         });
-        
-        // var invalid_pub0_array: bigint[] = bigint_to_array(64, 4, pub0++); // Assumes that incrementing the x value takes the point off the curve
-        // it('Testing invalid pub key: pub0: ' + invalid_pub0_array + ' pub1: ' + pub1, async function() {
-        //     let witness = await circuit.calculateWitness({"pubkey": [pub0_array, pub1_array]});
-        //     await circuit.checkConstraints(witness);
-        // });
     }
 
     test_cases.forEach(test_ecdsa_verify);
